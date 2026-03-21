@@ -1,0 +1,6 @@
+aws_region              = "ap-southeast-1"
+project_name            = "simple-jenkins-job"
+instance_type           = "t2.micro"
+alert_email             = "your-email@example.com"
+cloudflare_tunnel_token = "your-cloudflare-tunnel-token"
+git_repo_url            = "https://github.com/ronaldcatibag/simple-jenkins-job.git"

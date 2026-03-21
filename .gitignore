@@ -1,0 +1,16 @@
+.env
+nginx/certs/
+
+# Terraform
+personal-dev-terraform/.terraform/
+personal-dev-terraform/*.tfstate
+personal-dev-terraform/*.tfstate.backup
+personal-dev-terraform/terraform.tfvars
+personal-dev-terraform/errored.tfstate
+personal-dev-terraform/.terraform.lock.hcl
+
+# Node
+node_modules/
+my-portfolio/node_modules/
+my-portfolio/dist/
+my-portfolio/.angular/

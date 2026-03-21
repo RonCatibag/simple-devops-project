@@ -1,0 +1,28 @@
+services:
+    jenkins:
+        container_name: jenkins
+        image: 238809347283.dkr.ecr.af-south-1.amazonaws.com/devops/jenkins:latest
+        build:
+            context: ./server
+            args:
+                - TAG=${TAG:-latest}
+        ports:
+            - '8080:8080'
+            - '50000:50000'
+        restart: on-failure
+        volumes:
+            - ./server/jenkins.yaml:/var/jenkins.yaml
+        environment:
+            - FOO=someval
+            # uncomment these environment vars for local development only
+            # - JENKINS_URL=${JENKINS_URL}
+            # - JENKINS_ADMIN_ID=${JENKINS_ADMIN_USERNAME}
+            # - JENKINS_ADMIN_PASSWORD=${JENKINS_ADMIN_PASSWORD}
+            # - JENKINS_GITHUB_TOKEN=${JENKINS_GITHUB_TOKEN}
+            # - JENKINS_SSH_KEY_PASSWORD=${JENKINS_SSH_KEY_PASSWORD}
+            # - JENKINS_SSH_PRIVATE_KEY=${JENKINS_SSH_PRIVATE_KEY}
+            # - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET}
+            - JENKINS_OPTS=--prefix=/jenkins
+            - CASC_JENKINS_CONFIG=/var/jenkins.yaml
+volumes:
+    jenkins-data:

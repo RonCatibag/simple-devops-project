@@ -1,0 +1,261 @@
+jenkins:
+  authorizationStrategy:
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+  globalNodeProperties:
+    - envVars:
+        env:
+          - key: "FOO"
+            value: ${FOO}
+  # nodes:
+  #   - permanent:
+  #       labelString: "windows docker test"
+  #       mode: NORMAL
+  #       name: "build-server-120"
+  #       numExecutors: 1
+  #       remoteFS: "C:\\jenkins-agent-aws"
+  #       launcher:
+  #         ssh:
+  #           host: "160.119.141.120"
+  #           port: 22
+  #           credentialsId: jenkins-ssh
+  #           launchTimeoutSeconds: 60
+  #           maxNumRetries: 3
+  #           retryWaitTime: 30
+  #           sshHostKeyVerificationStrategy:
+  #             manuallyTrustedKeyVerificationStrategy:
+  #               requireInitialManualTrust: false
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: ${JENKINS_ADMIN_ID}
+          password: ${JENKINS_ADMIN_PASSWORD}
+
+appearance:
+  themeManager:
+    disableUserThemes: true
+    theme: "dark"
+  simpleTheme:
+    elements:
+      - cssText:
+          text: |
+            #main-panel .hljs {
+              color: #ff8989;
+              background-color: transparent;
+            }
+
+            #main-panel .hljs-name,
+            #main-panel .hljs-attr,
+            #main-panel .hljs-title,
+            #main-panel .hljs-code,
+            #main-panel .hljs-variable,
+            #main-panel .hljs-tag {
+              background-color: transparent;
+            }
+
+            #main-panel .hljs-name,
+            #main-panel .hljs-attr {
+              color: #bc8dc8;
+            }
+
+            #main-panel .hljs-title,
+            #main-panel .hljs-code,
+            #main-panel .hljs-variable,
+            #main-panel .hljs-tag {
+              color: #e9ff5a;
+            }
+
+            #main-panel .small-button-wrapper {
+              background-color: var(--header-bg-classic);
+              border: none;
+            }
+
+            #main-panel table.jch .subcaption {
+              background-color: #5a5a5a;
+            }
+
+            #main-panel .subcaption td {
+              background-color: #5a5a5a;
+            }
+
+            #main-panel table.diffLineTable th.lineNum.diff_original {
+              border: none;
+            }
+
+            # main-panel .menu-url-button {
+              color: #ff8989;
+              background-color: transparent;
+            }
+
+            #main-panel .hljs-name,
+            #main-panel .hljs-attr,
+            #main-panel .hljs-title,
+            #main-panel .hljs-code,
+            #main-panel .hljs-variable,
+            #main-panel .hljs-tag {
+              background-color: transparent;
+            }
+
+            #main-panel .hljs-name,
+            #main-panel .hljs-attr {
+              color: #bc8dc8;
+            }
+
+            #main-panel .hljs-title,
+            #main-panel .hljs-code,
+            #main-panel .hljs-variable,
+            #main-panel .hljs-tag {
+              color: #e9ff5a;
+            }
+
+            #main-panel .small-button-wrapper {
+              background-color: var(--header-bg-classic);
+              border: none;
+            }
+
+            #main-panel table.jch .subcaption {
+              background-color: #5a5a5a;
+            }
+
+            #main-panel .subcaption td {
+              background-color: #5a5a5a;
+            }
+
+            #main-panel table.diffLineTable th.lineNum.diff_original {
+              border: none;
+            }
+
+            # main-panel .small-button-wrapper .menu-url-button {
+              color: #ff8989;
+              background-color: var(--header-bg-classic);
+            }
+
+            #main-panel table.center.jch td,
+            #main-panel table.center.jch .lineNum,
+            #main-panel table.center.jch td div {
+              background-color: var(--pre-background);
+            }
+
+            #main-panel table.center.jch .subcaption td {
+              background-color: #5a5a5a;
+              color: #ffffff;
+            }
+
+            #main-panel table.center.jch .lineNum {
+              color: #bc8dc8;
+            }
+
+            #main-panel table.jch.diffLineTable .diffLineWrapper {
+              border: none;
+            }
+
+            #main-panel table.jch.diffLineTable td.diff_original {
+              background-color: rgba(243, 110, 130, 0.5);
+            }
+
+            #main-panel table.jch.diffLineTable td.diff_revised {
+              background-color: rgba(63, 184, 96, 0.5);
+            }
+
+            #main-panel table.jch.diffLineTable td.diff_revised div,
+            #main-panel table.jch.diffLineTable td.diff_original div,
+            #main-panel table.jch.diffLineTable td.diff_revised pre,
+            #main-panel table.jch.diffLineTable td.diff_original pre {
+              background-color: transparent;
+              border-radius: 0;
+            }
+
+            #main-panel table.center.jch td,
+            #main-panel table.center.jch .lineNum,
+            #main-panel table.center.jch td div {
+              background-color: var(--pre-background);
+            }
+
+            #main-panel .menu-url-button {
+              background-color: var(--pre-background);
+            }
+
+            #main-panel .menu-url-button a {
+              color: #bc8dc8;
+            }
+
+            #main-panel table.center.jch .lineNum {
+              color: #bc8dc8;
+            }
+
+            #main-panel table.jch.diffLineTable .diffLineWrapper {
+              border: none;
+            }
+
+            #main-panel table.jch.diffLineTable th.lineNum.diff_revised,
+            #main-panel table.jch.diffLineTable td.diff_original {
+              background-color: rgba(243 110 130, 0.5) !important;
+            }
+
+            #main-panel table.jch.diffLineTable td.diff_revised {
+              background-color: rgba(63, 184, 96, 0.5) !important;
+            }
+
+            #main-panel table.jch.diffLineTable td.diff_revised div,
+            #main-panel table.jch.diffLineTable td.diff_original div,
+            #main-panel table.jch.diffLineTable td.diff_revised pre,
+            #main-panel table.jch.diffLineTable td.diff_original pre {
+              background-color: transparent;
+              border-radius: 0;
+            }
+
+unclassified:
+  location:
+    url: ${JENKINS_URL}
+  githubpluginconfig:
+    configs:
+      - name: "Purple Group"
+        apiUrl: "https://api.github.com"
+        credentialsId: "jenkins-github-token"
+        manageHooks: true
+    hookSecretConfigs:
+      - credentialsId: "github-webhook-secret"
+  audit-trail:
+    displayUserName: true
+    logBuildCause: true
+    logCredentialsUsage: true
+    loggers:
+      - console:
+          dateFormat: "yyyy-MM-dd HH:mm:ss.SSS"
+          logPrefix: "AUDIT"
+          output: "STD_OUT"
+      - logFile:
+          log: "${JENKINS_HOME}/logs/audit.log"
+          limit: 100
+          count: 10
+
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - string:
+              id: "jenkins-github-token"
+              scope: GLOBAL
+              secret: ${JENKINS_GITHUB_TOKEN}
+              description: "Jenkins access token for GitHub"
+          - usernamePassword:
+              description: "Jenkins Github User"
+              id: "jenkins-github-user"
+              password: ${JENKINS_GITHUB_TOKEN}
+              scope: GLOBAL
+              username: "datariomj"
+          - string:
+              description: "Github webhook secret"
+              id: "github-webhook-secret"
+              scope: GLOBAL
+              secret: "${GITHUB_WEBHOOK_SECRET}"
+          - basicSSHUserPrivateKey:
+              scope: SYSTEM
+              id: jenkins-ssh
+              username: jenkins
+              passphrase: ${JENKINS_SSH_KEY_PASSWORD}
+              description: "Jenkins SSH private key file. Private key provided"
+              privateKeySource:
+                directEntry:
+                  privateKey: "${JENKINS_SSH_PRIVATE_KEY}"
