@@ -11,8 +11,8 @@
 npm-debug.log
 yarn-error.log
 
-# nginx
-*nginx*
+# nginx (keep nginx.conf for Docker builds)
+# *nginx*
 
 # IDEs and editors
 .idea/
