@@ -3,8 +3,8 @@ jenkins:
   globalNodeProperties:
     - envVars:
         env:
-          - key: "FOO"
-            value: ${FOO}
+          - key: "PROJECT_NAME"
+            value: "simple-devops-project"
   clouds:
     - docker:
         name: "docker-local"
@@ -28,20 +28,15 @@ jenkins:
             retentionStrategy:
               idleMinutes: 10
   securityRealm:
-    github:
-      githubWebUri: "https://github.com"
-      githubApiUri: "https://api.github.com"
-      clientID: "${GITHUB_OAUTH_CLIENT_ID}"
-      clientSecret: "${GITHUB_OAUTH_CLIENT_SECRET}"
-      oauthScopes: "read:org,user:email"
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          password: "${JENKINS_ADMIN_PASSWORD:-admin}"
+          name: "Administrator"
   authorizationStrategy:
-    github:
-      adminUserNames: "${GITHUB_ADMIN_USERS}"
-      organizationNames: ""
-      useRepositoryPermissions: true
-      allowAnonymousReadPermission: false
-      allowGithubWebHookPermission: true
-      allowCcTrayPermission: false
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
 
 appearance:
   themeManager:
@@ -221,12 +216,10 @@ unclassified:
     url: ${JENKINS_URL}
   githubpluginconfig:
     configs:
-      - name: "Purple Group"
+      - name: "GitHub"
         apiUrl: "https://api.github.com"
         credentialsId: "jenkins-github-token"
-        manageHooks: true
-    hookSecretConfigs:
-      - credentialsId: "github-webhook-secret"
+        manageHooks: false
   audit-trail:
     displayUserName: true
     logBuildCause: true
@@ -248,28 +241,19 @@ credentials:
           - string:
               id: "jenkins-github-token"
               scope: GLOBAL
-              secret: ${JENKINS_GITHUB_TOKEN}
+              secret: "${JENKINS_GITHUB_TOKEN:-placeholder}"
               description: "Jenkins access token for GitHub"
           - usernamePassword:
               description: "Jenkins Github User"
               id: "jenkins-github-user"
-              password: ${JENKINS_GITHUB_TOKEN}
+              password: "${JENKINS_GITHUB_TOKEN:-placeholder}"
               scope: GLOBAL
               username: "RonaldCatibag"
           - string:
               description: "Github webhook secret"
               id: "github-webhook-secret"
               scope: GLOBAL
-              secret: "${GITHUB_WEBHOOK_SECRET}"
-          - basicSSHUserPrivateKey:
-              scope: SYSTEM
-              id: jenkins-ssh
-              username: jenkins
-              passphrase: ${JENKINS_SSH_KEY_PASSWORD}
-              description: "Jenkins SSH private key file. Private key provided"
-              privateKeySource:
-                directEntry:
-                  privateKey: "${JENKINS_SSH_PRIVATE_KEY}"
+              secret: "${GITHUB_WEBHOOK_SECRET:-placeholder}"
 
 jobs:
   - script: |

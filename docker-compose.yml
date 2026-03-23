@@ -36,8 +36,7 @@ services:
       - GITHUB_ADMIN_USERS=${GITHUB_ADMIN_USERS:-RonaldCatibag}
       - JENKINS_GITHUB_TOKEN=${JENKINS_GITHUB_TOKEN}
       - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET}
-      - JENKINS_SSH_KEY_PASSWORD=${JENKINS_SSH_KEY_PASSWORD:-}
-      - JENKINS_SSH_PRIVATE_KEY=${JENKINS_SSH_PRIVATE_KEY:-}
+      - JENKINS_ADMIN_PASSWORD=${JENKINS_ADMIN_PASSWORD:-admin}
       - DEVOPS_REPO_URL=${DEVOPS_REPO_URL:-https://github.com/RonCatibag/simple-devops-project.git}
       - PORTFOLIO_REPO_URL=${PORTFOLIO_REPO_URL:-https://github.com/RonCatibag/simple-devops-project.git}
     depends_on:
