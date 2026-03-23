@@ -1,0 +1,23 @@
+projects:
+  - name: my-portfolio
+    description: "Angular portfolio — build, test & deploy on push"
+    repo: ${PORTFOLIO_REPO_URL}
+    branch: main
+    jenkinsfile: Jenkinsfile
+    agent_label: docker-agent
+    github_push: true
+    folder: angular
+    parameters:
+      - name: DEPLOY_ENV
+        default_value: production
+        description: "Target deployment environment"
+
+  # Add more projects below — the seed job picks them up automatically.
+  # - name: another-angular-app
+  #   description: "Another Angular project"
+  #   repo: https://github.com/your-org/another-angular-app.git
+  #   branch: main
+  #   jenkinsfile: Jenkinsfile
+  #   agent_label: docker-agent
+  #   github_push: true
+  #   folder: angular

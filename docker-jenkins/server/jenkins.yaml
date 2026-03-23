@@ -1,36 +1,47 @@
 jenkins:
-  authorizationStrategy:
-    loggedInUsersCanDoAnything:
-      allowAnonymousRead: false
+  numExecutors: 0
   globalNodeProperties:
     - envVars:
         env:
           - key: "FOO"
             value: ${FOO}
-  # nodes:
-  #   - permanent:
-  #       labelString: "windows docker test"
-  #       mode: NORMAL
-  #       name: "build-server-120"
-  #       numExecutors: 1
-  #       remoteFS: "C:\\jenkins-agent-aws"
-  #       launcher:
-  #         ssh:
-  #           host: "160.119.141.120"
-  #           port: 22
-  #           credentialsId: jenkins-ssh
-  #           launchTimeoutSeconds: 60
-  #           maxNumRetries: 3
-  #           retryWaitTime: 30
-  #           sshHostKeyVerificationStrategy:
-  #             manuallyTrustedKeyVerificationStrategy:
-  #               requireInitialManualTrust: false
+  clouds:
+    - docker:
+        name: "docker-local"
+        dockerApi:
+          dockerHost:
+            uri: "unix:///var/run/docker.sock"
+        templates:
+          - labelString: "docker-agent"
+            dockerTemplateBase:
+              image: "jenkins-agent:latest"
+              mounts:
+                - "type=bind,source=/var/run/docker.sock,target=/var/run/docker.sock"
+              environmentsString: |
+                JENKINS_URL=${JENKINS_URL}
+              network: "ci-net"
+            remoteFs: "/home/jenkins/agent"
+            connector:
+              attach:
+                user: "jenkins"
+            instanceCapStr: "4"
+            retentionStrategy:
+              idleMinutes: 10
   securityRealm:
-    local:
-      allowsSignup: false
-      users:
-        - id: ${JENKINS_ADMIN_ID}
-          password: ${JENKINS_ADMIN_PASSWORD}
+    github:
+      githubWebUri: "https://github.com"
+      githubApiUri: "https://api.github.com"
+      clientID: "${GITHUB_OAUTH_CLIENT_ID}"
+      clientSecret: "${GITHUB_OAUTH_CLIENT_SECRET}"
+      oauthScopes: "read:org,user:email"
+  authorizationStrategy:
+    github:
+      adminUserNames: "${GITHUB_ADMIN_USERS}"
+      organizationNames: ""
+      useRepositoryPermissions: true
+      allowAnonymousReadPermission: false
+      allowGithubWebHookPermission: true
+      allowCcTrayPermission: false
 
 appearance:
   themeManager:
@@ -244,7 +255,7 @@ credentials:
               id: "jenkins-github-user"
               password: ${JENKINS_GITHUB_TOKEN}
               scope: GLOBAL
-              username: "datariomj"
+              username: "RonaldCatibag"
           - string:
               description: "Github webhook secret"
               id: "github-webhook-secret"
@@ -259,3 +270,30 @@ credentials:
               privateKeySource:
                 directEntry:
                   privateKey: "${JENKINS_SSH_PRIVATE_KEY}"
+
+jobs:
+  - script: |
+      pipelineJob('seed-job') {
+        description('Reads YAML job maps and creates/updates pipeline jobs via Job DSL')
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote {
+                  url('${DEVOPS_REPO_URL}')
+                  credentials('jenkins-github-user')
+                }
+                branches('*/main')
+              }
+            }
+            scriptPath('jenkins-job-dsl-seed/Jenkinsfile.seed')
+            lightweight(true)
+          }
+        }
+        triggers {
+          githubPush()
+        }
+        properties {
+          disableConcurrentBuilds()
+        }
+      }

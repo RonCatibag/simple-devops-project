@@ -1,0 +1,23 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Generate Jobs') {
+            steps {
+                jobDsl(
+                    targets: 'jenkins-job-dsl-seed/seed-job.groovy',
+                    removedJobAction: 'DISABLE',
+                    removedViewAction: 'DELETE',
+                    lookupStrategy: 'SEED_JOB',
+                    additionalClasspath: '',
+                    sandbox: false
+                )
+            }
+        }
+    }
+
+    post {
+        success { echo 'Seed job completed — all pipeline jobs updated.' }
+        failure { echo 'Seed job failed — check DSL script or YAML syntax.' }
+    }
+}

@@ -25,9 +25,34 @@ services:
     volumes:
       - jenkins_home:/var/jenkins_home
       - /var/run/docker.sock:/var/run/docker.sock
+      - ./docker-jenkins/server/jenkins.yaml:/var/jenkins.yaml:ro
     environment:
       - JAVA_OPTS=-Djenkins.install.runSetupWizard=false
       - JENKINS_OPTS=--prefix=/jenkins
+      - CASC_JENKINS_CONFIG=/var/jenkins.yaml
+      - JENKINS_URL=${JENKINS_URL:-https://ronaldcatibag.uk/jenkins/}
+      - GITHUB_OAUTH_CLIENT_ID=${GITHUB_OAUTH_CLIENT_ID}
+      - GITHUB_OAUTH_CLIENT_SECRET=${GITHUB_OAUTH_CLIENT_SECRET}
+      - GITHUB_ADMIN_USERS=${GITHUB_ADMIN_USERS:-RonaldCatibag}
+      - JENKINS_GITHUB_TOKEN=${JENKINS_GITHUB_TOKEN}
+      - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET}
+      - JENKINS_SSH_KEY_PASSWORD=${JENKINS_SSH_KEY_PASSWORD:-}
+      - JENKINS_SSH_PRIVATE_KEY=${JENKINS_SSH_PRIVATE_KEY:-}
+      - DEVOPS_REPO_URL=${DEVOPS_REPO_URL}
+      - PORTFOLIO_REPO_URL=${PORTFOLIO_REPO_URL}
+    depends_on:
+      - jenkins-agent-build
+    networks:
+      - ci-net
+
+  jenkins-agent-build:
+    build:
+      context: ./docker-jenkins/agent
+      dockerfile: Dockerfile
+    image: jenkins-agent:latest
+    container_name: jenkins-agent-build
+    command: ["echo", "Agent image built — containers are spawned by Jenkins Docker cloud"]
+    restart: "no"
     networks:
       - ci-net
 

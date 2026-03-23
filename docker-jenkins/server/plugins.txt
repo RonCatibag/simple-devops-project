@@ -44,6 +44,8 @@ devops-portal:415.vaf57f86bb4d1
 discard-old-build:1.08
 display-url-api:2.217.va_6b_de84cc74b_
 docker-commons:457.v0f62a_94f11a_3
+docker-java-api:3.4.1-99.v52e22a_16c95f
+docker-plugin:1.7.1
 docker-workflow:634.vedc7242b_eda_7
 dotcoverrunner:1.0.7
 dotnet-sdk:1.4.0
