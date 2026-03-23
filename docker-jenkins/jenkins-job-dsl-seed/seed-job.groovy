@@ -1,6 +1,6 @@
 import groovy.yaml.YamlSlurper
 
-def jobMapDir = new File("${WORKSPACE}/jenkins-job-dsl-seed/jenksins-job-map")
+def jobMapDir = new File("${WORKSPACE}/docker-jenkins/jenkins-job-dsl-seed/jenksins-job-map")
 
 jobMapDir.eachFileMatch(~/.+\.yaml$/) { file ->
     def yaml = new YamlSlurper().parse(file)

@@ -38,8 +38,8 @@ services:
       - GITHUB_WEBHOOK_SECRET=${GITHUB_WEBHOOK_SECRET}
       - JENKINS_SSH_KEY_PASSWORD=${JENKINS_SSH_KEY_PASSWORD:-}
       - JENKINS_SSH_PRIVATE_KEY=${JENKINS_SSH_PRIVATE_KEY:-}
-      - DEVOPS_REPO_URL=${DEVOPS_REPO_URL}
-      - PORTFOLIO_REPO_URL=${PORTFOLIO_REPO_URL}
+      - DEVOPS_REPO_URL=${DEVOPS_REPO_URL:-https://github.com/RonCatibag/simple-devops-project.git}
+      - PORTFOLIO_REPO_URL=${PORTFOLIO_REPO_URL:-https://github.com/RonCatibag/simple-devops-project.git}
     depends_on:
       - jenkins-agent-build
     networks:

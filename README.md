@@ -119,6 +119,125 @@ Jenkins runs **as a Docker container** with the host's Docker socket mounted (`/
 - Docker socket mount grants Jenkins root-equivalent Docker access (acceptable for dev/lab)
 - `.env` file is git-ignored
 
+## Managing Jenkins
+
+### Deployment Workflow (SSM)
+
+After pushing changes to GitHub, redeploy on the EC2 instance:
+
+```bash
+aws ssm send-command \
+  --instance-ids "<instance-id>" \
+  --document-name "AWS-RunShellScript" \
+  --parameters '{"commands":["export HOME=/root","cd /home/ec2-user/simple-jenkins-job && git pull origin main 2>&1","docker compose up -d --build > /tmp/compose-build.log 2>&1; echo EXIT_CODE=$?"]}' \
+  --timeout-seconds 900 \
+  --region ap-southeast-1 \
+  --query 'Command.CommandId'
+```
+
+Check the result:
+
+```bash
+aws ssm get-command-invocation \
+  --command-id "<command-id>" \
+  --instance-id "<instance-id>" \
+  --region ap-southeast-1 \
+  --query '[Status, StandardOutputContent]' \
+  --output text
+```
+
+If the build fails, read the log:
+
+```bash
+aws ssm send-command ... --parameters '{"commands":["tail -80 /tmp/compose-build.log"]}'
+```
+
+### Updating Plugins
+
+Plugins are pinned in `docker-jenkins/server/plugins.txt` with exact versions (e.g. `git:5.9.0`). To update:
+
+1. **Find the latest version** at [plugins.jenkins.io](https://plugins.jenkins.io/) or the Jenkins update center
+2. **Edit `plugins.txt`** — change the version after the colon:
+   ```
+   git:5.10.0              # was git:5.9.0
+   docker-plugin:1316.v75635a_002b_0a_
+   ```
+3. **Commit, push, and redeploy** using the SSM workflow above
+4. **If plugin install fails** — check the build log for dependency errors. Common fixes:
+   - Update the conflicting dependency plugin too
+   - Use `--latest false` flag in the Dockerfile to prevent auto-upgrading transitive deps
+   - Check the plugin's page for minimum Jenkins version requirements
+
+### Adding New Plugins
+
+1. Find the plugin at [plugins.jenkins.io](https://plugins.jenkins.io/)
+2. Add it to `docker-jenkins/server/plugins.txt`:
+   ```
+   your-new-plugin:1.2.3
+   ```
+3. Commit, push, redeploy — `jenkins-plugin-cli` resolves transitive dependencies automatically
+
+### Upgrading Jenkins Version
+
+1. **Edit `docker-jenkins/server/Dockerfile`** — change the base image tag:
+   ```dockerfile
+   FROM jenkins/jenkins:2.560-jdk21    # was 2.549-jdk21
+   ```
+2. **Check plugin compatibility** — major Jenkins upgrades may break pinned plugins. Run a local build first:
+   ```bash
+   cd docker-jenkins/server
+   docker build -t jenkins-test .
+   ```
+3. If plugins fail, update them in `plugins.txt` to versions compatible with the new Jenkins
+4. Once the local build passes, push and redeploy
+
+### Configuration as Code (CasC)
+
+Jenkins configuration lives in `docker-jenkins/server/jenkins.yaml` and is mounted via docker-compose. Changes to this file take effect on container restart — no rebuild needed:
+
+```bash
+# After pushing jenkins.yaml changes:
+docker compose restart jenkins
+```
+
+CasC manages: security realm, authorization, cloud agents, credentials, job DSL seeds, and global settings.
+
+### Key Files
+
+| File | Purpose | Requires rebuild? |
+|------|---------|-------------------|
+| `docker-jenkins/server/plugins.txt` | Plugin list with pinned versions | Yes (`docker compose up --build`) |
+| `docker-jenkins/server/Dockerfile` | Jenkins base image + plugin install | Yes |
+| `docker-jenkins/server/jenkins.yaml` | CasC config (security, agents, jobs) | No (restart only) |
+| `docker-jenkins/agent/Dockerfile` | Build agent image (for Docker cloud) | Yes |
+| `docker-compose.yml` | Service definitions and env vars | Yes if structure changes |
+
+### Agent Strategy (t3.micro)
+
+On a `t3.micro` (1 GB RAM + 2 GB swap), use the **built-in controller node** for builds:
+
+- Set `numExecutors: 1` in `jenkins.yaml` (limit to 1 concurrent build)
+- Use `agent any` in Jenkinsfiles
+- Docker cloud agents are defined but will compete for the same limited resources
+
+When you scale to a larger instance or add dedicated agent nodes, switch `numExecutors: 0` on the controller and route builds to Docker cloud agents or SSH agents.
+
+### Backup & Restore
+
+Jenkins state lives in the `jenkins_home` Docker volume:
+
+```bash
+# Backup
+docker run --rm -v simple-jenkins-job_jenkins_home:/data -v $(pwd):/backup alpine \
+  tar czf /backup/jenkins-backup-$(date +%Y%m%d).tar.gz -C /data .
+
+# Restore
+docker compose down
+docker run --rm -v simple-jenkins-job_jenkins_home:/data -v $(pwd):/backup alpine \
+  tar xzf /backup/jenkins-backup-YYYYMMDD.tar.gz -C /data
+docker compose up -d
+```
+
 ## Troubleshooting
 
 ```bash
@@ -132,9 +251,14 @@ docker logs -f portfolio
 docker logs -f cloudflared
 
 # Rebuild everything
-docker compose down -v
+docker compose down
 docker compose up -d --build
 
 # Check tunnel connectivity
 docker logs cloudflared | grep "connection registered"
+
+# Jenkins plugin dependency error during build
+# Read the build log for the exact conflict, then update
+# the offending plugin version in plugins.txt
+tail -80 /tmp/compose-build.log
 ```

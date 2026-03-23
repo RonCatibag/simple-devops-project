@@ -1,5 +1,5 @@
 jenkins:
-  numExecutors: 0
+  numExecutors: 1
   globalNodeProperties:
     - envVars:
         env:
@@ -286,7 +286,7 @@ jobs:
                 branches('*/main')
               }
             }
-            scriptPath('jenkins-job-dsl-seed/Jenkinsfile.seed')
+            scriptPath('docker-jenkins/jenkins-job-dsl-seed/Jenkinsfile.seed')
             lightweight(true)
           }
         }
